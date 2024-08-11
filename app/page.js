@@ -45,14 +45,14 @@ export default function Home() {
     setInventory(inventoryList)
   }
 
-  const addItem = async (item) => {
+  const addItem = async (item, price) => {
     const docRef = doc(collection(firestore, 'inventory'), item)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      await setDoc(docRef, { quantity: quantity + 1 })
+      const { quantity, price} = docSnap.data()
+      await setDoc(docRef, { quantity: quantity + 1, price: "$" + (parseInt(price.slice(1)) + 3).toString() })
     } else {
-      await setDoc(docRef, { quantity: 1 })
+      await setDoc(docRef, { quantity: 1, price: "$1"})
     }
     await updateInventory()
   }
@@ -129,7 +129,7 @@ export default function Home() {
           </Typography>
         </Box>
         <Stack width="800px" height="300px" spacing={2} overflow={'auto'}>
-          {inventory.map(({ name, quantity }) => (
+          {inventory.map(({ name, quantity, price }) => (
             <Box
               key={name}
               width="100%"
@@ -140,11 +140,14 @@ export default function Home() {
               bgcolor={'#f0f0f0'}
               paddingX={5}
             >
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
+              <Typography variant={'h3'} color={'#333'} textAlign={'center'} border={'5px solid lightblue'} margin={'5px'}>
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </Typography>
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
+              <Typography variant={'h3'} color={'#333'} textAlign={'center'} border={'5px solid lightblue'} margin={'5px'}>
                 Quantity: {quantity}
+              </Typography>
+              <Typography variant={'h3'} color={'#333'} textAlign={'center'} border={'5px solid lightblue'} margin={'5px'}>
+                Price: {price}
               </Typography>
               <Button variant="contained" onClick={() => removeItem(name)}>
                 Remove
